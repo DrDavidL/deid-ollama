@@ -51,6 +51,7 @@ This project provides a Jupyter notebook that processes CSV files to identify an
 | `MAX_ROWS_PER_BATCH` | Maximum rows per batch file | `300` |
 | `MAX_WORKERS` | Number of parallel threads | `10` |
 | `MAX_RETRIES` | Retry attempts per row | `4` |
+| `DEIDENTIFICATION_PASSES` | Number of passes through the LLM | `2` |
 | `OLLAMA_API_URL` | URL for Ollama API | `"http://localhost:11434/api/generate"` |
 | `MODEL_NAME` | LLM model to use | `"gemma3:4b"` |
 | `MAX_CHUNK_SIZE` | Maximum characters per chunk | `5000` |
@@ -61,7 +62,8 @@ This project provides a Jupyter notebook that processes CSV files to identify an
 2. For each batch, it processes the specified columns row by row
 3. Each text is sent to the Ollama API with a prompt to identify and replace PHI
 4. The LLM replaces PHI with category labels (e.g., `[PERSON]`, `[DATE]`)
-5. Processed batches are saved as new CSV files
+5. By default, each text undergoes two passes through the LLM to catch any PHI missed in the first pass
+6. Processed batches are saved as new CSV files
 
 ## PHI Categories Replaced
 
