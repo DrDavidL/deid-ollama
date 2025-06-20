@@ -1,3 +1,6 @@
+using.ipynb_checkpoints
+using.ipynb
+
 ########################
 # PYTHON BASICS
 ########################
@@ -9,6 +12,7 @@ __pycache__/
 *.egg-info/
 .installed.cfg
 .Python
+
 
 ########################
 # PACKAGE / BUILD SYSTEMS
