@@ -10,278 +10,98 @@ This project provides a Jupyter notebook (`improved_parallel_deid.ipynb`) that p
 
 ## Key Features
 
-### Core Functionality
-- **Multi-Column Processing**: De-identify one or more text columns in a single run
-- **Large File Support**: Automatically splits large CSVs into manageable batches
-- **Live Progress Tracking**: See which row is being processed in real-time
-- **Resumable Processing**: Can be stopped and restarted, automatically skipping completed batches
-- **Error Handling**: Rows with errors are retried multiple times before being marked as "unable to deidentify"
-- **Flexible Output**: Option to either replace the original columns or add new de-identified columns
-- **Multi-Pass Processing**: Each text undergoes multiple passes through the LLM to catch missed PHI
-
-### Advanced Concurrency Control
-- **Rate Limiting**: Controls how many requests are sent to Ollama at once
-- **Semaphore-based Concurrency Control**: Limits the number of concurrent API calls
-- **Exponential Backoff Strategy**: Implements exponential backoff with jitter for retries
-- **Queue-based Processing**: Option for more controlled processing flow
-- **Multiple Implementation Options**: Choose the approach that works best for your system
+- **Multi-Column Processing**: De-identify one or more text columns in a single run.
+- **Large File Support**: Automatically splits large CSVs into manageable batches.
+- **Live Progress Tracking**: See which row is being processed in real-time.
+- **Resumable Processing**: Can be stopped and restarted, automatically skipping completed batches.
+- **Error Handling**: Rows with errors are retried multiple times before being marked as "unable to deidentify".
+- **Flexible Output**: Option to either replace the original columns or add new de-identified columns.
+- **Multi-Pass Processing**: Each text undergoes multiple passes through the LLM to catch missed PHI.
+- **Advanced Concurrency Control**: Includes multiple strategies to manage parallel requests to the Ollama API.
 
 ## Installation & Setup
 
 ### 1. Install Ollama
 
-**macOS:**
-```bash
-# Install via Homebrew (recommended)
-brew install ollama
-
-# Or download from official website
-# Visit: https://ollama.ai/download
-```
-
-**Linux:**
-```bash
-# Install via curl
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Or using package managers
-# Ubuntu/Debian: sudo apt install ollama
-# Fedora: sudo dnf install ollama
-```
-
-**Windows:**
-- Download the installer from [https://ollama.ai/download](https://ollama.ai/download)
-- Run the installer and follow the setup wizard
+Follow the instructions on the [Ollama website](https://ollama.ai/download) to install Ollama on your system.
 
 ### 2. Configure Ollama for Parallel Processing
 
-To optimize Ollama for concurrent requests, configure it with appropriate settings:
+To optimize Ollama for concurrent requests, you can configure it with the following environment variables. These can be set in your shell's startup file (e.g., `~/.bashrc`, `~/.zshrc`).
 
-**Start Ollama with parallel processing enabled:**
 ```bash
-# Set environment variables for better parallel performance
 export OLLAMA_NUM_PARALLEL=4
 export OLLAMA_MAX_LOADED_MODELS=2
 export OLLAMA_FLASH_ATTENTION=1
-
-# Start Ollama service
-ollama serve
 ```
 
-**For persistent configuration, create a service file or add to your shell profile:**
+After setting these, restart your terminal or source the startup file, and then start the Ollama service:
+
 ```bash
-# Add to ~/.bashrc, ~/.zshrc, or equivalent
-echo 'export OLLAMA_NUM_PARALLEL=4' >> ~/.bashrc
-echo 'export OLLAMA_MAX_LOADED_MODELS=2' >> ~/.bashrc
-echo 'export OLLAMA_FLASH_ATTENTION=1' >> ~/.bashrc
+ollama serve
 ```
 
 ### 3. Install and Configure LLM Model
 
-**Install the default model:**
+Pull the recommended model for this notebook:
+
 ```bash
-# Pull the recommended model
 ollama pull gemma3:4b
-
-# Verify installation
-ollama list
 ```
 
-**Alternative models (choose based on your hardware):**
-```bash
-# For systems with more RAM/VRAM
-ollama pull gemma3:8b
-ollama pull llama3.1:8b
-
-# For systems with limited resources
-ollama pull gemma3:2b
-ollama pull phi3:mini
-```
+You can verify the installation by running `ollama list`.
 
 ### 4. Install Python Dependencies
 
-**Create a virtual environment (recommended):**
+It is recommended to use a virtual environment.
+
 ```bash
-# Create virtual environment
+# Create and activate a virtual environment
 python -m venv deid-env
+source deid-env/bin/activate  # On macOS/Linux
+# deid-env\Scripts\activate  # On Windows
 
-# Activate virtual environment
-# On macOS/Linux:
-source deid-env/bin/activate
-# On Windows:
-deid-env\Scripts\activate
-```
-
-**Install required packages:**
-```bash
-# Install from requirements.txt (if available)
-pip install -r requirements.txt
-
-# Or install manually
+# Install required packages
 pip install pandas requests jupyter notebook
-```
-
-**Optional dependencies for enhanced functionality:**
-```bash
-# For better progress bars and logging
-pip install tqdm rich
-
-# For data validation
-pip install pydantic
-
-# For performance monitoring
-pip install psutil
-```
-
-### 5. Verify Installation
-
-**Test Ollama connection:**
-```bash
-# Test if Ollama is running
-curl http://localhost:11434/api/tags
-
-# Test model inference
-ollama run gemma3:4b "Hello, how are you?"
-```
-
-**Test Python environment:**
-```python
-# Run this in Python to verify dependencies
-import pandas as pd
-import requests
-import json
-print("All dependencies installed successfully!")
 ```
 
 ## Usage
 
-1. Open the `improved_parallel_deid.ipynb` notebook in Jupyter
-2. Fill out the Configuration section:
-   - `INPUT_CSV_PATH`: Path to your CSV file
-   - `COLUMNS_TO_CLEAN`: List of column names to de-identify
-   - Optional: Adjust batch size, worker count, and other settings
-3. Run all cells in the notebook
-4. De-identified CSV files will be created in the same directory as the input file
+1.  Open the `improved_parallel_deid.ipynb` notebook in Jupyter.
+2.  In the **Configuration** section, set the `INPUT_CSV_PATH` to your CSV file and list the columns to clean in `COLUMNS_TO_CLEAN`.
+3.  Run all cells in the notebook.
+4.  De-identified CSV files will be created in the same directory as the input file.
+
+### Trying it out with `tester.csv`
+
+This repository includes a `tester.csv` file with some tricky PHI examples. To try it out, simply set `INPUT_CSV_PATH = "tester.csv"` in the notebook's configuration.
 
 ## Configuration Options
 
-### Required Settings
-| Setting | Description | Example |
-|---------|-------------|---------|
-| `INPUT_CSV_PATH` | Path to your CSV file | `"tester.csv"` |
-| `COLUMNS_TO_CLEAN` | List of column names to de-identify | `["note_text", "patient_name"]` |
-
-### Processing Settings
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `REPLACE_ORIGINAL_COLUMN` | Replace original columns or add new ones | `True` |
-| `OUTPUT_PREFIX` | Prefix for output files | `"deidentified_output_post_LLM"` |
-| `MAX_ROWS_PER_BATCH` | Maximum rows per batch file | `100` |
-| `MAX_RETRIES` | Retry attempts per row | `4` |
-| `DEIDENTIFICATION_PASSES` | Number of passes through the LLM | `2` |
-| `MAX_CHUNK_SIZE` | Maximum characters per chunk | `5000` |
-
-### Concurrency Settings
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `MAX_WORKERS` | Number of parallel threads | `5` |
-| `MAX_CONCURRENT_REQUESTS` | Maximum concurrent requests to Ollama | `3` |
-| `USE_RATE_LIMITING` | Enable rate limiting for API calls | `True` |
-| `RATE_LIMIT_CALLS` | Maximum calls per time period | `3` |
-| `RATE_LIMIT_PERIOD` | Time period in seconds | `1` |
-| `IMPLEMENTATION_APPROACH` | Processing approach to use | `"semaphore"` |
-
-### Ollama Settings
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `OLLAMA_API_URL` | URL for Ollama API | `"http://localhost:11434/api/generate"` |
-| `MODEL_NAME` | LLM model to use | `"gemma3:4b"` |
+The notebook provides several configuration options to customize the de-identification process. These are located in the **Configuration** section of the notebook.
 
 ## Implementation Approaches
 
 The notebook provides multiple implementation approaches to handle different system configurations and requirements:
 
-- **`semaphore`** (default): Uses a semaphore to limit concurrent API calls
-- **`rate_limit`**: Uses a rate limiter to control the frequency of API calls
-- **`queue`**: Uses a queue-based approach for more controlled processing
-- **`process_pool`**: Uses ProcessPoolExecutor instead of ThreadPoolExecutor
+-   **`semaphore`** (default): Uses a semaphore to limit concurrent API calls. This is a reliable and performant option for most use cases.
+-   **`rate_limit`**: Uses a rate limiter to control the frequency of API calls.
+-   **`queue`**: Uses a queue-based approach for more controlled processing.
+-   **`process_pool`**: Uses a pool of processes for parallel execution, which can be more efficient for CPU-bound tasks.
 
-Choose the approach that works best for your system by setting the `IMPLEMENTATION_APPROACH` variable.
-
-## How It Works
-
-1. The notebook reads the input CSV file and splits it into batches
-2. For each batch, it processes the specified columns row by row
-3. Each text is sent to the Ollama API with a prompt to identify and replace PHI
-4. The LLM replaces PHI with category labels (e.g., `[PERSON]`, `[DATE]`)
-5. By default, each text undergoes two passes through the LLM to catch any PHI missed in the first pass
-6. Processed batches are saved as new CSV files
-7. Advanced concurrency control prevents overwhelming the Ollama API
-
-## PHI Categories Replaced
-
-- Names → `[PERSON]`
-- Dates → `[DATE]`
-- Locations → `[LOCATION]`
-- Phone numbers → `[PHONE]`
-- Email addresses → `[EMAIL]`
-- Identification numbers (SSN, MRN, etc.) → `[ID_NUMBER]`
-
-## Performance Considerations
-
-- Processing speed depends on your hardware, the LLM model used, and the size of the text
-- This implementation uses conservative default concurrency settings to avoid overwhelming Ollama
-- Adjust `MAX_CONCURRENT_REQUESTS` based on your system's capabilities and Ollama's performance
-- For very large files, consider increasing `MAX_ROWS_PER_BATCH` if your system has sufficient memory
+You can choose the approach by setting the `IMPLEMENTATION_APPROACH` variable in the notebook's configuration.
 
 ## Troubleshooting
 
-If you experience issues with Ollama and parallel processing:
+If you experience issues with Ollama and parallel processing, here are some specific recommendations to try in the notebook's **Configuration** section:
 
-1. **Further reduce concurrency**: Set `MAX_CONCURRENT_REQUESTS` to 1 or 2
-2. **Increase delay between requests**: Modify the rate limiter settings
-3. **Use a different model**: Some models may handle concurrent requests better than others
-4. **Run Ollama with more resources**: If possible, allocate more CPU/memory to Ollama
-5. **Try different implementation approaches**: Test each approach to see which works best for your system
-6. **Use the troubleshooting function**: The notebook includes a `troubleshoot_with_minimal_concurrency()` function for minimal concurrency settings
-
-## Why This Solves Concurrent Errors
-
-This implementation addresses common issues with parallel processing and Ollama:
-
-1. **Limits concurrent requests**: Uses semaphores to strictly control how many requests are sent at once
-2. **Adds controlled delays**: Implements rate limiting and jitter to space out requests
-3. **Handles failures gracefully**: Uses exponential backoff to retry failed requests with increasing delays
-4. **Provides alternative approaches**: Offers different implementation strategies to find what works best for your specific setup
-
+1.  **Reduce `MAX_CONCURRENT_REQUESTS`**: Start by lowering this value to `2` or `1`.
+2.  **Try the `queue` approach**: If reducing concurrent requests doesn't solve the issue, change the `IMPLEMENTATION_APPROACH` to `'queue'`.
+3.  **Increase `MAX_RETRIES`**: If you are still seeing occasional errors, you can increase the `MAX_RETRIES` value to `5` or `6`.
 
 ## License
 
-This project is licensed under the MIT License:
-
-```
-MIT License
-
-Copyright (c) 2025 David Liebovitz, MD, Northwestern University, Institute for Artificial Intelligence in Medicine
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 ## Disclaimer
 
