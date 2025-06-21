@@ -76,6 +76,8 @@ pip install pandas requests jupyter notebook
 
 This repository includes a `tester.csv` file with some tricky PHI examples. To try it out, simply set `INPUT_CSV_PATH = "tester.csv"` in the notebook's configuration.
 
+An example of the de-identified output from `tester.csv` is provided in `deidentified_tester.csv`.
+
 ## Configuration Options
 
 The notebook provides several configuration options to customize the de-identification process. These are located in the **Configuration** section of the notebook.
