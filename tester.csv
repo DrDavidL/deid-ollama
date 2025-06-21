@@ -1,0 +1,6 @@
+﻿patient_id,first_name,last_name,dob,phone_number,note_text
+101,John,Smith,4/12/85,555-123-4567,"Patient John Smith presented with a cough. His date of birth is April 12, 1985. He can be reached at 555-123-4567. Scheduled a follow-up for next Tuesday. Mr. Smith lives at 123 Maple Street, Anytown, USA. His email is john.smith@example.com."
+102,Jane,Doe,8/22/92,555-987-6543,"Jane Doe, born on 1992-08-22, reports recurring headaches. We discussed her medical history. Contact number is (555) 987-6543. Patient mentioned she works at Acme Corp. Her husband, Mark Doe, can also be reached if needed."
+103,Peter,Jones,11/30/76,555-555-1212,"Peter Jones (DOB: 30 Nov 1976) came in for his annual check-up. All vitals are stable. He mentioned his new address is 456 Oak Avenue, Springfield. His old phone number was 555-555-1111, but the new one is 555-555-1212."
+104,Mary,Johnson,1/15/01,555-234-5678,"This is a note for Mary Johnson. She was seen on 2023-10-26. Her MRN is 98765. Please call her at 555-234-5678 to confirm her next appointment. Mary's mother is Susan Johnson, who is her emergency contact."
+105,Carlos,Garcia,7/1/63,555-876-5432,"Patient: Garcia, Carlos. DOB: July 1, 1963. Phone: 555.876.5432. Complains of back pain after a fall last week at his home, 789 Pine Lane. He is allergic to penicillin. Email for records is c.garcia@emailprovider.net."
