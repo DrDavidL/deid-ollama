@@ -1,6 +1,6 @@
 # CSV De-identification with Local LLM (Ollama)
 
-A robust tool for de-identifying Protected Health Information (PHI) in CSV files using a locally running Large Language Model (LLM) via Ollama. This implementation provides advanced concurrency control and multiple processing approaches to handle parallel processing efficiently while avoiding API overload issues.
+A customizeable tool to explore de-identifying Protected Health Information (PHI) in CSV files using a locally running Large Language Model (LLM) via Ollama. This implementation provides advanced concurrency control and multiple processing approaches to handle parallel processing efficiently while avoiding API overload issues.
 
 **⚠️ IMPORTANT**: This is **NOT validated** for production use. Only use for exploration and understanding. Identifying the right chunk size and number of passes required for a given local model to deidentify text chunks is not known or predictable.
 
